@@ -10,7 +10,10 @@ class SymbolTable():
 
 
     def insert(self, name, type_info, params=None, body=None):
-        self.symbols[name] = (type_info, params, body)
+        if body:
+            self.symbols[name] = (type_info, params, True)
+        else:
+            self.symbols[name] = (type_info, params, False)
 
 
     def lookup(self, name):
@@ -38,7 +41,7 @@ class SemanticAnalyzer():
         type_info = self.symbol_table.lookup(var[1])
         if not type_info:
             self.symbol_table.insert(*var[1 : ])
-        else:
+        elif type_info[0] == var[2]:
             raise SemanticError('redefinition of \'{}\''.format(var[1]))
 
 
@@ -46,9 +49,9 @@ class SemanticAnalyzer():
         type_info = self.symbol_table.lookup(func[1])
         if not type_info:
             self.symbol_table.insert(*func[1 : ])
-        elif type_info[2]:
+        elif type_info[-1] and func[-1]:
             raise SemanticError('redefinition of \'{}\''.format(func[1]))
-        elif type_info[1] == func[2]:
+        elif type_info[0] == func[2]:
             self.symbol_table.insert(*func[1 : ])
         else:
             raise SemanticError('redefinition of \'{}\''.format(func[1]))
