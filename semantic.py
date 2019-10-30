@@ -1,0 +1,60 @@
+from error import SemanticError
+
+class SymbolTable():
+    def __init__(self):
+        self.symbols = {
+            'int':      ('int',),
+            'float':    ('float',),
+            'void':     ('void',)
+        }
+
+
+    def insert(self, name, type_info, params=None, body=None):
+        self.symbols[name] = (type_info, params, body)
+
+
+    def lookup(self, name):
+        return self.symbols.get(name)
+
+
+class SemanticAnalyzer():
+
+    def __init__(self):
+        self.symbol_table = SymbolTable()
+
+
+    def visit_program(self, prog):
+        jt = {
+                'DECLARE':  self.visit_declaration,
+                'FUNCTION': self.visit_function
+        }
+        for statement in prog[-1]:
+            if not statement[0] in ('DECLARE', 'FUNCTION'):
+                raise SemanticError('expected declaration or function definition')
+            jt[statement[0]](statement)
+
+
+    def visit_declaration(self, var):
+        type_info = self.symbol_table.lookup(var[1])
+        if not type_info:
+            self.symbol_table.insert(*var[1 : ])
+        else:
+            raise SemanticError('redefinition of \'{}\''.format(var[1]))
+
+
+    def visit_function(self, func):
+        type_info = self.symbol_table.lookup(func[1])
+        if not type_info:
+            self.symbol_table.insert(*func[1 : ])
+        elif type_info[2]:
+            raise SemanticError('redefinition of \'{}\''.format(func[1]))
+        elif type_info[1] == func[2]:
+            self.symbol_table.insert(*func[1 : ])
+        else:
+            raise SemanticError('redefinition of \'{}\''.format(func[1]))
+
+
+    def analyze(self, ast=tuple()):
+        self.visit_program(ast)
+
+        return self.symbol_table.symbols
