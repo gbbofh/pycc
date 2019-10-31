@@ -77,7 +77,7 @@ class Parser():
 
     def call(self, left):
         args = self.call_args()
-        left = ('FUNCTION', left[1])
+        left = (left[1])
         return ('CALL', left, args)
 
 
@@ -217,7 +217,7 @@ class Parser():
 
 
     def parameter_list(self):
-        params = None
+        params = tuple()
         if self.tokens[0][0] != 'TK_RPAR':
             while True:
 
@@ -244,6 +244,8 @@ class Parser():
                 if not self.tokens[0][0] == 'TK_COMMA':
                     break
                 self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        if len(params) == 0:
+            params = None
         return params
 
 
