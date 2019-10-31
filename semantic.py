@@ -41,6 +41,8 @@ class SemanticAnalyzer():
         type_info = self.globals.lookup(var[1])
         if not type_info:
             self.globals.insert(*var[1 : ])
+            if var[2] == 'void':
+                raise SemanticError('cannot declare variable of type void')
         elif type_info[0] == var[2]:
             raise SemanticError('redefinition of {}'.format(var[1]))
 

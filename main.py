@@ -9,9 +9,9 @@ from error import ParseError, LexError, SemanticError
 def main():
 
     lexer = lex.Lexer()
-    try:
 
-        if len(sys.argv) > 1:
+    if len(sys.argv) > 1:
+        try:
             with open(sys.argv[1]) as fp:
                 lines = [l.strip() for l in fp.readlines()]
                 tokens = lexer.tokenize(lines)
@@ -21,15 +21,24 @@ def main():
                 analyzer = semantic.SemanticAnalyzer()
                 symbols = analyzer.analyze(ast)
                 print(symbols)
-        else:
-                while True:
+        except (EOFError, ParseError, LexError, SemanticError) as e:
+            print(e)
+    else:
+            while True:
+                try:
                     line = input('> ')
                     tokens = lexer.tokenize([line])
                     parser = parse.Parser(tokens)
                     ast = parser.program()
                     print(ast)
-    except (EOFError, ParseError, LexError, SemanticError) as e:
-        print(e)
+                    analyzer = semantic.SemanticAnalyzer()
+                    symbols = analyzer.analyze(ast)
+                    print(symbols)
+                except (ParseError, LexError, SemanticError) as e:
+                    print(e)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except (EOFError, KeyboardInterrupt) as e:
+        print('Farewell')
