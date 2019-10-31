@@ -128,7 +128,7 @@ class Parser():
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         rule = Parser.rule[self.prev[0]][0]
         if not rule:
-            line, col = self.tokens[0][2], self.prev[0][3]
+            line, col = self.tokens[0][2], self.tokens[0][3]
             raise ParseError('bad rule entry, or token', line, col)
 
         # Since we have to get the function dynamically from
@@ -169,10 +169,20 @@ class Parser():
         return ('BLOCK', statements)
 
 
+    def return_statement(self):
+        stmt = self.expression()
+        if not self.tokens[0][0] == 'TK_ENDLINE':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \';\' following expression', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        return ('RETURN', stmt)
+
+
     def statement(self):
         statement_types = {
                 'TK_LBRACE': self.block_statement,
-                'TK_RETURN': 'RETURN'
+                'TK_RETURN': self.return_statement,
+                'TK_ENDLINE': lambda: ('EMPTY',)
         }
         if self.tokens[0][0] in statement_types:
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]

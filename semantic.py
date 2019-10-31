@@ -45,16 +45,29 @@ class SemanticAnalyzer():
             raise SemanticError('redefinition of \'{}\''.format(var[1]))
 
 
+    def visit_block(self, block):
+        for s in block[-1]:
+            self.visit_declaration(s)
+
+
     def visit_function(self, func):
         type_info = self.symbol_table.lookup(func[1])
+
         if not type_info:
             self.symbol_table.insert(*func[1 : ])
+            if func[-1]:
+                    self.visit_block(func[-1])
         elif type_info[-1] and func[-1]:
             raise SemanticError('redefinition of \'{}\''.format(func[1]))
         elif type_info[0] == func[2]:
             self.symbol_table.insert(*func[1 : ])
         else:
             raise SemanticError('redefinition of \'{}\''.format(func[1]))
+
+
+    def visit_return(self, statement):
+        if statement[-1]:
+            pass
 
 
     def analyze(self, ast=tuple()):
