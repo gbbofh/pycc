@@ -53,11 +53,31 @@ class SemanticAnalyzer():
             raise SemanticError('undefined variable {}'.format(var[1]))
 
 
+    def visit_while(self, stmt):
+        pass
+
+
+    def visit_do_while(self, stmt):
+        pass
+
+
+    def visit_if(self, stmt):
+        pass
+
+
+    def visit_return(self, stmt):
+        pass
+
+
     def visit_block(self, block):
         statement_types = {
-                'CALL': self.visit_call,
-                'DECLARE': self.visit_declaration,
-                'ASSIGN': self.visit_assignment
+                'CALL':     self.visit_call,
+                'DECLARE':  self.visit_declaration,
+                'ASSIGN':   self.visit_assignment,
+                'IF':       self.visit_if,
+                'WHILE':    self.visit_while,
+                'DO_WHILE': self.visit_do_while,
+                'RETURN':   self.visit_return
         }
         for s in block[-1]:
             statement_types.get(s[0], lambda s: None)(s)
@@ -87,11 +107,6 @@ class SemanticAnalyzer():
             raise SemanticError('too few arguments to {}'.format(func[1]))
         elif len(type_info[1]) < len(func[2]):
             raise SemanticError('too many arguments to {}'.format(func[1]))
-
-
-    def visit_return(self, statement):
-        if statement[-1]:
-            pass
 
 
     def analyze(self, ast=tuple()):
