@@ -377,13 +377,30 @@ class Parser():
 
         return self.variable_decl(type_info)
 
-        # raise ParseError('expected function or variable declaration')
+
+    def struct_decl(self):
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        name = self.prev[1]
+        if not self.tokens[0][0] == 'TK_LBRACE':
+            return ('STRUCT', name, None)
+        # TODO: parse assignment
+        while self.tokens[0][0] != 'TK_RBRACE':
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            # TODO: parse struct members
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        if not self.tokens[0][0] == 'TK_ENDLINE':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \';\' following declaration', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        return ('STRUCT', name, None)
 
 
     def declaration(self):
         decl = None
         declaration_types = {
-                'TK_TYPE':  self.function_variable_decl
+                'TK_TYPE':  self.function_variable_decl,
+                'TK_STRUCT': self.struct_decl
         }
         if self.tokens[0][0] in declaration_types:
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]

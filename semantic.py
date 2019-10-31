@@ -29,10 +29,11 @@ class SemanticAnalyzer():
     def visit_program(self, prog):
         jt = {
                 'DECLARE':  self.visit_declaration,
-                'FUNCTION': self.visit_function
+                'FUNCTION': self.visit_function,
+                'STRUCT': lambda x: False
         }
         for statement in prog[-1]:
-            if not statement[0] in ('DECLARE', 'FUNCTION'):
+            if not statement[0] in jt.keys():
                 raise SemanticError('expected declaration or function definition')
             jt[statement[0]](statement)
 
@@ -70,7 +71,7 @@ class SemanticAnalyzer():
 
 
     def visit_block(self, block):
-        statement_types = {
+        jt = {
                 'CALL':     self.visit_call,
                 'DECLARE':  self.visit_declaration,
                 'ASSIGN':   self.visit_assignment,
@@ -80,7 +81,7 @@ class SemanticAnalyzer():
                 'RETURN':   self.visit_return
         }
         for s in block[-1]:
-            statement_types.get(s[0], lambda s: None)(s)
+            jt.get(s[0], lambda s: None)(s)
 
 
     def visit_function(self, func):
