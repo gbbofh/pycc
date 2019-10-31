@@ -75,7 +75,10 @@ class Parser():
                 if not self.tokens[0][0] == 'TK_COMMA':
                     break
                 self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ] # RPAR
+        if not self.tokens[0][0] == 'TK_RPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \')\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         return params
 
 
@@ -88,7 +91,8 @@ class Parser():
     def unary(self):
         unary_ops = {
                 'TK_MINUS': 'NEGATE',
-                'TK_BANG': 'NOT'
+                'TK_BANG': 'BANG',
+                'TK_NOT': 'BITWISE_NOT'
         }
         op = self.prev[0]
         expr = self.parse_precedence(Precedence.UNARY)
@@ -411,6 +415,7 @@ class Parser():
             'TK_AND':           (None, binary, Precedence.BIN_AND),
             'TK_OR':            (None, binary, Precedence.BIN_OR),
             'TK_XOR':           (None, binary, Precedence.BIN_XOR),
+            'TK_NOT':           (unary, None, Precedence.UNARY),
             'TK_LSHIFT':        (None, binary, Precedence.SHIFT),
             'TK_RSHIFT':        (None, binary, Precedence.SHIFT),
             'TK_EQUAL':         (None, binary, Precedence.ASSIGNMENT),
