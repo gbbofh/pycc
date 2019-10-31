@@ -20,6 +20,15 @@ class Lexer():
     token_names['&&'] = 'TK_LAND'
     token_names['\|\|'] = 'TK_LOR'
 
+    token_names['&'] = 'TK_AND'
+    token_names['\|'] = 'TK_OR'
+
+    token_names['<<'] = 'TK_LSHIFT'
+    token_names['>>'] = 'TK_RSHIFT'
+
+    token_names['\^'] = 'TK_XOR'
+    token_names['~'] = 'TK_NOT'
+
     token_names['=='] = 'TK_EQEQUAL'
     token_names['>='] = 'TK_GEQUAL'
     token_names['<='] = 'TK_LEQUAL'
