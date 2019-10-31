@@ -195,11 +195,76 @@ class Parser():
         return ('RETURN', stmt)
 
 
+    def if_statement(self):
+        if not self.tokens[0][0] == 'TK_LPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \'(\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        expr = self.expression()
+        if not self.tokens[0][0] == 'TK_RPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \')\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        statement = self.statement()
+        eblock = None
+
+        while self.tokens[0][0] == 'TK_ELSE':
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            eblock = self.statement()
+
+        return ('IF', expr, statement, eblock)
+
+
+    def while_statement(self):
+        if not self.tokens[0][0] == 'TK_LPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \'(\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        expr = self.expression()
+        if not self.tokens[0][0] == 'TK_RPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \')\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        statement = self.statement()
+
+        return ('WHILE', expr, statement)
+
+
+    def do_while_statement(self):
+        statement = self.statement()
+
+        if not self.tokens[0][0] == 'TK_WHILE':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected keyword \'while\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        if not self.tokens[0][0] == 'TK_LPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \'(\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        expr = self.expression()
+        if not self.tokens[0][0] == 'TK_RPAR':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \')\'', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        if not self.tokens[0][0] == 'TK_ENDLINE':
+            line, col = self.tokens[0][2], self.tokens[0][3]
+            raise ParseError('expected \';\' following expression', line, col)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        return ('DO_WHILE', expr, statement)
+
+
     def statement(self):
         statement_types = {
-                'TK_LBRACE': self.block_statement,
-                'TK_RETURN': self.return_statement,
-                'TK_ENDLINE': lambda: ('EMPTY',)
+                'TK_DO':        self.do_while_statement,
+                'TK_WHILE':     self.while_statement,
+                'TK_IF':        self.if_statement,
+                'TK_LBRACE':    self.block_statement,
+                'TK_RETURN':    self.return_statement,
+                'TK_ENDLINE':   lambda: ('EMPTY',)
         }
         if self.tokens[0][0] in statement_types:
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
