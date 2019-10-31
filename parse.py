@@ -23,14 +23,19 @@ class Parser():
         self.prev = tokens[0]
 
 
-    def type_int(self):
-        i = int(self.prev[1], 0)
-        return ('INTEGER', i)
+    # def type_int(self):
+    #     i = int(self.prev[1], 0)
+    #     return ('INTEGER', i)
 
 
-    def type_float(self):
+    # def type_float(self):
+    #     f = float(self.prev[1])
+    #     return ('FLOAT', f)
+
+
+    def type_number(self):
         f = float(self.prev[1])
-        return ('FLOAT', f)
+        return ('NUMBER', f)
 
 
     def type_string(self):
@@ -337,8 +342,9 @@ class Parser():
             'TK_LOR':           (None, binary, Precedence.OR),
             'TK_TYPE':          (None, None, Precedence.NONE),
             'TK_IDENTIFIER':    (variable, None, Precedence.PRIMARY),
-            'TK_FLOAT':         (type_float, None, Precedence.PRIMARY),
-            'TK_INTEGER':       (type_int, None, Precedence.PRIMARY),
+            #'TK_FLOAT':         (type_float, None, Precedence.PRIMARY),
+            #'TK_INTEGER':       (type_int, None, Precedence.PRIMARY),
+            'TK_NUMBER':        (type_number, None, Precedence.PRIMARY),
             'TK_STRING':        (type_string, None, Precedence.PRIMARY),
             'TK_ENDLINE':       (None, None, Precedence.NONE),
             'TK_EOF':           (None, None, Precedence.NONE),
