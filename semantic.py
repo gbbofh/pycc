@@ -45,8 +45,8 @@ class SemanticAnalyzer():
             raise SemanticError('redefinition of {}'.format(var[1]))
 
 
-    def visit_assignment(self, expr):
-        type_info = self.globals.lookup(var[1])
+    def visit_assignment(self, var):
+        type_info = self.globals.lookup(var[1][1])
         if not type_info:
             raise SemanticError('undefined variable {}'.format(var[1]))
 
@@ -55,7 +55,7 @@ class SemanticAnalyzer():
         statement_types = {
                 'CALL': self.visit_call,
                 'DECLARE': self.visit_declaration,
-                'ASSIGN': lambda s: None
+                'ASSIGN': self.visit_assignment
         }
         for s in block[-1]:
             statement_types.get(s[0], lambda s: None)(s)
@@ -72,6 +72,7 @@ class SemanticAnalyzer():
             raise SemanticError('redefinition of {}'.format(func[1]))
         elif type_info[0] == func[2]:
             self.globals.insert(*func[1 : ])
+            self.visit_block(func[-1])
         else:
             raise SemanticError('redefinition of {}'.format(func[1]))
 
