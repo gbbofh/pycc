@@ -13,3 +13,5 @@ as it works just as well considering that this is a prototype project. The
 semantic analysis portion needs reworked, and it is very much in its infancy
 right now -- it is completely incapable of handling scope at this time, but this
 should be fixed in the coming days.
+
+Code generation is not implemented yet, but should be coming soon-ish.
