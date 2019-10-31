@@ -102,6 +102,14 @@ class Parser():
                 'TK_STAR':      'MULT',
                 'TK_SLASH':     'DIV',
 
+                'TK_AND':       'BITWISE_AND',
+                'TK_OR':        'BITWISE_OR',
+                'TK_XOR':       'BITWISE_XOR',
+                'TK_LSHIFT':    'LEFTSHIFT',
+                'TK_RSHIFT':    'RIGHTSHIFT',
+
+                'TK_EQUAL':     'ASSIGN',
+
                 'TK_EQEQUAL':   'EQUAL',
 
                 'TK_GEQUAL':    'GEQUAL',
@@ -111,13 +119,7 @@ class Parser():
                 'TK_LESSER':    'LESSER',
 
                 'TK_LAND':      'LOGICAL_AND',
-                'TK_LOR':       'LOGICAL_OR',
-
-                'TK_AND':       'BITWISE_AND',
-                'TK_OR':        'BITWISE_OR',
-                'TK_XOR':       'BITWISE_XOR',
-                'TK_LSHIFT':    'LEFTSHIFT',
-                'TK_RSHIFT':    'RIGHTSHIFT'
+                'TK_LOR':       'LOGICAL_OR'
         }
         op = self.prev[0]
         rule = Parser.rule[op]
@@ -346,7 +348,7 @@ class Parser():
             'TK_XOR':           (None, binary, Precedence.BIN_XOR),
             'TK_LSHIFT':        (None, binary, Precedence.SHIFT),
             'TK_RSHIFT':        (None, binary, Precedence.SHIFT),
-            'TK_EQUAL':         (None, binary, Precedence.NONE),
+            'TK_EQUAL':         (None, binary, Precedence.ASSIGNMENT),
             'TK_EQEQUAL':       (None, binary, Precedence.EQUALITY),
             'TK_GEQUAL':        (None, binary, Precedence.COMPARISON),
             'TK_LEQUAL':        (None, binary, Precedence.COMPARISON),

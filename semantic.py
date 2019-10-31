@@ -23,7 +23,7 @@ class SymbolTable():
 class SemanticAnalyzer():
 
     def __init__(self):
-        self.symbol_table = SymbolTable()
+        self.globals = SymbolTable()
 
 
     def visit_program(self, prog):
@@ -38,15 +38,17 @@ class SemanticAnalyzer():
 
 
     def visit_declaration(self, var):
-        type_info = self.symbol_table.lookup(var[1])
+        type_info = self.globals.lookup(var[1])
         if not type_info:
-            self.symbol_table.insert(*var[1 : ])
+            self.globals.insert(*var[1 : ])
         elif type_info[0] == var[2]:
-            raise SemanticError('redefinition of \'{}\''.format(var[1]))
+            raise SemanticError('redefinition of {}'.format(var[1]))
 
 
     def visit_assignment(self, expr):
-        pass
+        type_info = self.globals.lookup(var[1])
+        if not type_info:
+            raise SemanticError('undefined variable {}'.format(var[1]))
 
 
     def visit_block(self, block):
@@ -60,22 +62,22 @@ class SemanticAnalyzer():
 
 
     def visit_function(self, func):
-        type_info = self.symbol_table.lookup(func[1])
+        type_info = self.globals.lookup(func[1])
 
         if not type_info:
-            self.symbol_table.insert(*func[1 : ])
+            self.globals.insert(*func[1 : ])
             if func[-1]:
                     self.visit_block(func[-1])
         elif type_info[-1] and func[-1]:
-            raise SemanticError('redefinition of \'{}\''.format(func[1]))
+            raise SemanticError('redefinition of {}'.format(func[1]))
         elif type_info[0] == func[2]:
-            self.symbol_table.insert(*func[1 : ])
+            self.globals.insert(*func[1 : ])
         else:
-            raise SemanticError('redefinition of \'{}\''.format(func[1]))
+            raise SemanticError('redefinition of {}'.format(func[1]))
 
 
     def visit_call(self, func):
-        type_info = self.symbol_table.lookup(func[1])
+        type_info = self.globals.lookup(func[1])
         if not type_info:
             raise SemanticError('undefined reference to {}'.format(func[1]))
         elif len(type_info[1]) > len(func[2]):
@@ -92,4 +94,4 @@ class SemanticAnalyzer():
     def analyze(self, ast=tuple()):
         self.visit_program(ast)
 
-        return self.symbol_table.symbols
+        return self.globals.symbols
