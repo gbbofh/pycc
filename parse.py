@@ -83,6 +83,9 @@ class Parser():
                 'TK_MINUS': 'NEGATE',
                 'TK_BANG': 'BANG',
                 'TK_NOT': 'BITWISE_NOT',
+                'TK_AND': 'REFERENCE',
+                'TK_STAR': 'DEREFERENCE',
+                'TK_SIZEOF': 'SIZEOF'
         }
         op = self.prev[0]
         expr = self.parse_precedence(Precedence.UNARY)
@@ -430,7 +433,7 @@ class Parser():
 
 
     # Rule entries follow the following format:
-    # unary handler, infix handler, precedence number
+    # prefix handler, infix handler, precedence number
     rule = {
 
             'TK_LPAR':          (group, call, Precedence.CALL),
@@ -442,9 +445,9 @@ class Parser():
             'TK_MINUS':         (unary, binary, Precedence.TERM),
             'TK_PLUS':          (None, binary, Precedence.TERM),
             'TK_SLASH':         (None, binary, Precedence.FACTOR),
-            'TK_STAR':          (None, binary, Precedence.FACTOR),
+            'TK_STAR':          (unary, binary, Precedence.FACTOR),
             'TK_BANG':          (unary, None, Precedence.TERM),
-            'TK_AND':           (None, binary, Precedence.BIN_AND),
+            'TK_AND':           (unary, binary, Precedence.BIN_AND),
             'TK_OR':            (None, binary, Precedence.BIN_OR),
             'TK_XOR':           (None, binary, Precedence.BIN_XOR),
             'TK_NOT':           (unary, None, Precedence.UNARY),
@@ -462,6 +465,7 @@ class Parser():
             'TK_LAND':          (None, binary, Precedence.AND),
             'TK_LOR':           (None, binary, Precedence.OR),
             'TK_TYPE':          (None, None, Precedence.NONE),
+            'TK_SIZEOF':        (unary, None, Precedence.UNARY),
             'TK_IDENTIFIER':    (variable, None, Precedence.PRIMARY),
             'TK_NUMBER':        (type_number, None, Precedence.PRIMARY),
             'TK_STRING':        (type_string, None, Precedence.PRIMARY),

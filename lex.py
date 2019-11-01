@@ -16,6 +16,7 @@ class Lexer():
     token_names['while'] = 'TK_WHILE'
     token_names['do'] = 'TK_DO'
     token_names['struct'] = 'TK_STRUCT'
+    token_names['sizeof'] = 'TK_SIZEOF'
     token_names['[A-Za-z_][A-Za-z0-9_]*'] = 'TK_IDENTIFIER'
     #token_names['((0x[0-9A-Fa-f]+)|([0-9]+))'] = 'TK_INTEGER'
     token_names['[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'] = 'TK_NUMBER'
