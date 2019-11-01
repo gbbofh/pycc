@@ -27,16 +27,6 @@ class Parser():
         self.prev = tokens[0]
 
 
-    # def type_int(self):
-    #     i = int(self.prev[1], 0)
-    #     return ('INTEGER', i)
-
-
-    # def type_float(self):
-    #     f = float(self.prev[1])
-    #     return ('FLOAT', f)
-
-
     def type_number(self):
         f = float(self.prev[1])
         return ('NUMBER', f)
@@ -92,11 +82,30 @@ class Parser():
         unary_ops = {
                 'TK_MINUS': 'NEGATE',
                 'TK_BANG': 'BANG',
-                'TK_NOT': 'BITWISE_NOT'
+                'TK_NOT': 'BITWISE_NOT',
         }
         op = self.prev[0]
         expr = self.parse_precedence(Precedence.UNARY)
         return (unary_ops[op], expr)
+
+
+    def pre_op(self):
+        ops = {
+                'TK_DPLUS': 'PREINCREMENT',
+                'TK_DMINUS': 'PREDECREMENT'
+        }
+        op = self.prev[0]
+        expr = self.parse_precedence(Precedence.UNARY)
+        return (ops[op], expr)
+
+
+    def post_op(self, left):
+        ops = {
+                'TK_DPLUS': 'POSTINCREMENT',
+                'TK_DMINUS': 'POSTDECREMENT'
+        }
+        op = self.prev[0]
+        return (ops[op], left)
 
 
     def binary(self, left):
@@ -259,6 +268,10 @@ class Parser():
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
         return ('DO_WHILE', expr, statement)
+
+
+    def for_statement(self):
+        pass
 
 
     def statement(self):
@@ -424,6 +437,8 @@ class Parser():
             'TK_RPAR':          (None, None, Precedence.NONE),
             'TK_LBRACE':        (None, None, Precedence.NONE),
             'TK_RBRACE':        (None, None, Precedence.NONE),
+            'TK_DPLUS':         (pre_op, post_op, Precedence.UNARY),
+            'TK_DMINUS':        (pre_op, post_op, Precedence.UNARY),
             'TK_MINUS':         (unary, binary, Precedence.TERM),
             'TK_PLUS':          (None, binary, Precedence.TERM),
             'TK_SLASH':         (None, binary, Precedence.FACTOR),
@@ -448,8 +463,6 @@ class Parser():
             'TK_LOR':           (None, binary, Precedence.OR),
             'TK_TYPE':          (None, None, Precedence.NONE),
             'TK_IDENTIFIER':    (variable, None, Precedence.PRIMARY),
-            #'TK_FLOAT':         (type_float, None, Precedence.PRIMARY),
-            #'TK_INTEGER':       (type_int, None, Precedence.PRIMARY),
             'TK_NUMBER':        (type_number, None, Precedence.PRIMARY),
             'TK_STRING':        (type_string, None, Precedence.PRIMARY),
             'TK_ENDLINE':       (None, None, Precedence.NONE),

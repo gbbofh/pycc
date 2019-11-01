@@ -10,7 +10,6 @@ class Lexer():
 
     token_names['(int)|(char)|(float)|(void)'] = 'TK_TYPE'
     token_names[r'"(?:\\.|[^"\\])*"'] = 'TK_STRING'
-    #token_names['(return)'] = 'TK_KEYWORD'
     token_names['if'] = 'TK_IF'
     token_names['else'] = 'TK_ELSE'
     token_names['return'] = 'TK_RETURN'
@@ -18,7 +17,6 @@ class Lexer():
     token_names['do'] = 'TK_DO'
     token_names['struct'] = 'TK_STRUCT'
     token_names['[A-Za-z_][A-Za-z0-9_]*'] = 'TK_IDENTIFIER'
-    #token_names['[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'] = 'TK_FLOAT'
     #token_names['((0x[0-9A-Fa-f]+)|([0-9]+))'] = 'TK_INTEGER'
     token_names['[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'] = 'TK_NUMBER'
 
@@ -43,6 +41,9 @@ class Lexer():
     token_names['>'] = 'TK_GREATER'
     token_names['<'] = 'TK_LESSER'
 
+    token_names['\+\+'] = 'TK_DPLUS'
+    token_names['--'] = 'TK_DMINUS'
+
     token_names['\+'] = 'TK_PLUS'
     token_names['-'] = 'TK_MINUS'
 
@@ -63,7 +64,6 @@ class Lexer():
     token_names[';'] = 'TK_ENDLINE'
 
     token_names[','] = 'TK_COMMA'
-    # token_names['(return)'] = 'TK_RETURN'
 
     # token_names = {
 
