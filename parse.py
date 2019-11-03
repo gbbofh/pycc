@@ -22,9 +22,10 @@ class Precedence(IntEnum):
 class Parser():
 
 
-    def __init__(self, tokens):
+    def __init__(self, tokens=[]):
         self.tokens = tokens
-        self.prev = tokens[0]
+        if tokens:
+            self.prev = tokens[0]
 
 
     def type_number(self):
@@ -438,6 +439,12 @@ class Parser():
             declarations = declarations + (self.declaration(),)
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         return ('PROGRAM',) + (declarations,)
+
+
+    def parse(self, tokens):
+        self.tokens = tokens
+        self.prev = tokens[0]
+        return self.program()
 
 
     # Rule entries follow the following format:
