@@ -9,11 +9,8 @@ class SymbolTable():
         }
 
 
-    def insert(self, name, type_info, params=None, body=None):
-        if body:
-            self.symbols[name] = (type_info, params, True)
-        else:
-            self.symbols[name] = (type_info, params, False)
+    def insert(self, name, *args):
+        self.symbols[name] = args
 
 
     def lookup(self, name):
@@ -41,7 +38,7 @@ class SemanticAnalyzer():
     def visit_declaration(self, var):
         type_info = self.globals.lookup(var[1])
         if not type_info:
-            self.globals.insert(*var[1 : ])
+            self.globals.insert(var[1], var[2:])
             if var[2] == 'void':
                 raise SemanticError('cannot declare variable of type void')
         elif type_info[0] == var[2]:
@@ -88,13 +85,13 @@ class SemanticAnalyzer():
         type_info = self.globals.lookup(func[1])
 
         if not type_info:
-            self.globals.insert(*func[1 : ])
+            self.globals.insert(func[1], func[0:-1], True if func[-1] else False)
             if func[-1]:
                     self.visit_block(func[-1])
         elif type_info[-1] and func[-1]:
             raise SemanticError('redefinition of {}'.format(func[1]))
         elif type_info[0] == func[2]:
-            self.globals.insert(*func[1 : ])
+            self.globals.insert(func[1], func[0:-1], True if func[-1] else False)
             self.visit_block(func[-1])
         else:
             raise SemanticError('redefinition of {}'.format(func[1]))
