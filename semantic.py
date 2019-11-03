@@ -1,12 +1,14 @@
 from error import SemanticError
 
 class SymbolTable():
-    def __init__(self):
+    def __init__(self, outer=None):
         self.symbols = {
             'int':      ('int',),
             'float':    ('float',),
             'void':     ('void',)
         }
+
+        self.outer = outer
 
 
     def insert(self, name, *args):
@@ -14,7 +16,10 @@ class SymbolTable():
 
 
     def lookup(self, name):
-        return self.symbols.get(name)
+        sym = self.symbols.get(name)
+        if not sym and self.outer:
+            return self.outer.lookup(name)
+        return sym
 
 
 # TODO: Need to add scoping to this. Currently everything goes into the global
@@ -23,6 +28,7 @@ class SemanticAnalyzer():
 
     def __init__(self):
         self.globals = SymbolTable()
+        self.current = self.globals
 
 
     def visit_program(self, prog):
@@ -38,9 +44,9 @@ class SemanticAnalyzer():
 
 
     def visit_declaration(self, var):
-        type_info = self.globals.lookup(var[1])
+        type_info = self.current.lookup(var[1])
         if not type_info:
-            self.globals.insert(var[1], var[2:])
+            self.current.insert(var[1], var[2:])
             if var[2] == 'void':
                 raise SemanticError('cannot declare variable of type void')
         elif type_info[0] == var[2]:
@@ -48,14 +54,14 @@ class SemanticAnalyzer():
 
 
     def visit_assignment(self, var):
-        type_info = self.globals.lookup(var[1][1])
+        type_info = self.current.lookup(var[1][1])
         if not type_info:
             raise SemanticError('undefined variable {}'.format(var[1]))
         self.visit_expr(var[-1])
 
 
     def visit_variable(self, var):
-        type_info = self.globals.lookup(var[1])
+        type_info = self.current.lookup(var[1])
         if not type_info:
             raise SemanticError('undefined variable {}'.format(var[1]))
 
@@ -126,28 +132,33 @@ class SemanticAnalyzer():
                 'DO_WHILE': self.visit_do_while,
                 'RETURN':   self.visit_return,
         }
+        sym = SymbolTable(self.current)
+        self.current = sym
+
         for s in block[-1]:
             jt.get(s[0], lambda s: None)(s)
 
+        self.current = self.current.outer
+
 
     def visit_function(self, func):
-        type_info = self.globals.lookup(func[1])
+        type_info = self.current.lookup(func[1])
 
         if not type_info:
-            self.globals.insert(func[1], func[0:-1], True if func[-1] else False)
+            self.current.insert(func[1], func[0:-1], True if func[-1] else False)
             if func[-1]:
                     self.visit_block(func[-1])
         elif type_info[-1] and func[-1]:
             raise SemanticError('redefinition of {}'.format(func[1]))
         elif type_info[0] == func[2]:
-            self.globals.insert(func[1], func[0:-1], True if func[-1] else False)
+            self.current.insert(func[1], func[0:-1], True if func[-1] else False)
             self.visit_block(func[-1])
         else:
             raise SemanticError('redefinition of {}'.format(func[1]))
 
 
     def visit_call(self, func):
-        type_info = self.globals.lookup(func[1])
+        type_info = self.current.lookup(func[1])
         if not type_info:
             raise SemanticError('undefined reference to {}'.format(func[1]))
         elif len(type_info[1]) > len(func[2]):
@@ -159,4 +170,4 @@ class SemanticAnalyzer():
     def analyze(self, ast=tuple()):
         self.visit_program(ast)
 
-        return self.globals.symbols
+        return self.current.symbols
