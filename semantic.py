@@ -49,6 +49,53 @@ class SemanticAnalyzer():
         type_info = self.globals.lookup(var[1][1])
         if not type_info:
             raise SemanticError('undefined variable {}'.format(var[1]))
+        self.visit_expr(var[-1])
+
+
+    def visit_variable(self, var):
+        type_info = self.globals.lookup(var[1])
+        if not type_info:
+            raise SemanticError('undefined variable {}'.format(var[1]))
+
+
+    def visit_unary(self, expr):
+        self.visit_expr(expr[1 : ])
+
+
+    def visit_binary(self, expr):
+        for operand in expr[1 : ]:
+            self.visit_expr(expr)
+
+
+    def visit_expr(self, expr):
+        jt = {
+                'ADD': self.visit_binary,
+                'SUB': self.visit_binary,
+                'MULT': self.visit_binary,
+                'DIV': self.visit_binary,
+                'BITWISE_AND': self.visit_binary,
+                'BITWISE_OR': self.visit_binary,
+                'BITWISE_XOR': self.visit_binary,
+                'LEFTSHIFT': self.visit_binary,
+                'RIGHTSHIFT': self.visit_binary,
+                'ASSIGN': self.visit_binary,
+                'EQUAL': self.visit_binary,
+                'GEQUAL': self.visit_binary,
+                'LEQUAL': self.visit_binary,
+                'NEQUAL': self.visit_binary,
+                'GREATER': self.visit_binary,
+                'LESSER': self.visit_binary,
+                'LOGICAL_AND': self.visit_binary,
+                'LOGICAL_OR': self.visit_binary,
+                'NEGATE': self.visit_unary,
+                'NEGATE': self.visit_unary,
+                'BANG': self.visit_unary,
+                'BITWISE_NOT': self.visit_unary,
+                'REFERENCE': self.visit_unary,
+                'DEREFERENCE': self.visit_unary,
+                'SIZEOF': self.visit_unary
+        }
+        jt.get(expr[0], lambda e: None)(expr)
 
 
     def visit_while(self, stmt):
