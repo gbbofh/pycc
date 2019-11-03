@@ -17,6 +17,8 @@ class SymbolTable():
         return self.symbols.get(name)
 
 
+# TODO: Need to add scoping to this. Currently everything goes into the global
+# scope -- this is bad, and I should feel bad.
 class SemanticAnalyzer():
 
     def __init__(self):
@@ -59,12 +61,12 @@ class SemanticAnalyzer():
 
 
     def visit_unary(self, expr):
-        self.visit_expr(expr[1 : ])
+        self.visit_expr(expr[-1])
 
 
     def visit_binary(self, expr):
         for operand in expr[1 : ]:
-            self.visit_expr(expr)
+            self.visit_expr(operand)
 
 
     def visit_expr(self, expr):
@@ -78,7 +80,7 @@ class SemanticAnalyzer():
                 'BITWISE_XOR': self.visit_binary,
                 'LEFTSHIFT': self.visit_binary,
                 'RIGHTSHIFT': self.visit_binary,
-                'ASSIGN': self.visit_binary,
+                'ASSIGN': self.visit_assignment,
                 'EQUAL': self.visit_binary,
                 'GEQUAL': self.visit_binary,
                 'LEQUAL': self.visit_binary,
@@ -88,12 +90,12 @@ class SemanticAnalyzer():
                 'LOGICAL_AND': self.visit_binary,
                 'LOGICAL_OR': self.visit_binary,
                 'NEGATE': self.visit_unary,
-                'NEGATE': self.visit_unary,
                 'BANG': self.visit_unary,
                 'BITWISE_NOT': self.visit_unary,
                 'REFERENCE': self.visit_unary,
                 'DEREFERENCE': self.visit_unary,
-                'SIZEOF': self.visit_unary
+                'SIZEOF': self.visit_unary,
+                'VARIABLE': self.visit_variable
         }
         jt.get(expr[0], lambda e: None)(expr)
 
@@ -122,7 +124,7 @@ class SemanticAnalyzer():
                 'IF':       self.visit_if,
                 'WHILE':    self.visit_while,
                 'DO_WHILE': self.visit_do_while,
-                'RETURN':   self.visit_return
+                'RETURN':   self.visit_return,
         }
         for s in block[-1]:
             jt.get(s[0], lambda s: None)(s)
