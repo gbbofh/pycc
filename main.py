@@ -70,61 +70,6 @@ class PyCC():
     }
 
 
-lines = []
-
-lexer = lex.Lexer()
-parser = parse.Parser()
-analyzer = semantic.SemanticAnalyzer()
-
-def evaluate_line(line):
-    global lines
-    global lexer
-    global parser
-    global analyzer
-    try:
-        ln, src = line.split(maxsplit=1)
-        ln = int(ln)
-        if ln > len(lines):
-            lines += ['' for x in range(ln + 1)]
-            lines[ln] = src
-    except (TypeError, ValueError) as e:
-        if line.strip() == 'eval':
-            tokens = lexer.tokenize(lines)
-            print(tokens, '\n')
-            ast = parser.parse(tokens)
-            print(ast, '\n')
-            symbols = analyzer.analyze(ast)
-            print(symbols, '\n')
-        else:
-            tokens = lexer.tokenize([line])
-            print(tokens, '\n')
-            ast = parser.parse(tokens)
-            print(ast, '\n')
-            symbols = analyzer.analyze(ast)
-            print(symbols, '\n')
-
-def main():
-    if len(sys.argv) > 1:
-        try:
-            with open(sys.argv[1]) as fp:
-                lines = [l.strip() for l in fp.readlines()]
-        except (EOFError, ParseError, LexError, SemanticError) as e:
-            print(e)
-    else:
-            while True:
-                try:
-                    line = input('> ')
-                    # tokens = lexer.tokenize([line])
-                    # parser = parse.Parser(tokens)
-                    # ast = parser.program()
-                    # print(ast)
-                    # analyzer = semantic.SemanticAnalyzer()
-                    # symbols = analyzer.analyze(ast)
-                    # print(symbols)
-                    evaluate_line(line)
-                except (ParseError, LexError, SemanticError) as e:
-                    print(e)
-
 if __name__ == '__main__':
     try:
         PyCC.main()
