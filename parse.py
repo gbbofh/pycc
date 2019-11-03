@@ -46,6 +46,14 @@ class Parser():
 
 
     def group(self):
+        if self.tokens[0][0] == 'TK_TYPE':
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            t = self.prev[1]
+            if not self.tokens[0][0] == 'TK_RPAR':
+                raise ParseError('expected \')\' following type')
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            expr = self.expression();
+            return ('CAST', t, expr)
         expr = ('GROUP', self.expression())
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         return expr
