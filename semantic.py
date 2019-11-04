@@ -173,16 +173,24 @@ class SemanticAnalyzer():
         type_info = self.current.lookup(func[1])
 
         if not type_info:
-            self.current.insert(func[1], func[0:-1], True if func[-1] else False)
-            if func[-1]:
-                    self.visit_block(func[-1])
-        elif type_info[-1] and func[-1]:
+            self.current.insert(func[1], func[2 : -1], True)
+        elif type_info[-1]:
             raise SemanticError('redefinition of {}'.format(func[1]))
         elif type_info[0] == func[2]:
-            self.current.insert(func[1], func[0:-1], True if func[-1] else False)
+            self.current.insert(func[1], func[2 : -1])
             self.visit_block(func[-1])
         else:
             raise SemanticError('redefinition of {}'.format(func[1]))
+
+        sym = SymbolTable(self.current)
+        self.current = sym
+
+        for p in func[3]:
+            self.current.insert(p[1], p[2])
+
+        self.visit_block(func[-1])
+
+        self.current = self.current.outer
 
 
     def visit_call(self, func):
