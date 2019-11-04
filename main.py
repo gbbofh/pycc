@@ -65,7 +65,7 @@ class PyCC():
 
     def main():
         if len(sys.argv) > 1:
-            PyCC.file()
+            PyCC.file(sys.argv[1])
         else:
             PyCC.repl()
 

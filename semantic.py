@@ -1,5 +1,6 @@
 from error import SemanticError
 
+
 class SymbolTable():
     def __init__(self, outer=None):
         self.symbols = {
@@ -15,15 +16,17 @@ class SymbolTable():
         self.symbols[name] = args
 
 
-    def lookup(self, name):
+    def lookup(self, name, check_outer=True):
         sym = self.symbols.get(name)
-        if not sym and self.outer:
+        if not sym and self.outer and check_outer:
             return self.outer.lookup(name)
         return sym
 
 
-# TODO: Need to add scoping to this. Currently everything goes into the global
-# scope -- this is bad, and I should feel bad.
+    def clear(self):
+        self.symbols.clear()
+
+
 class SemanticAnalyzer():
 
     def __init__(self):
@@ -39,16 +42,16 @@ class SemanticAnalyzer():
         }
         for statement in prog[-1]:
             if not statement[0] in jt.keys():
-                raise SemanticError('expected declaration or function definition')
+                raise SemanticError('expected declaration')
             jt[statement[0]](statement)
 
 
     def visit_declaration(self, var):
-        type_info = self.current.lookup(var[1])
+        type_info = self.current.lookup(var[1], check_outer=False)
         if not type_info:
             self.current.insert(var[1], var[2:])
             if var[2] == 'void':
-                raise SemanticError('cannot declare variable of type void')
+                raise SemanticError('identifier ' + var[1] + ' cannot be void')
         elif type_info[0] == var[2]:
             raise SemanticError('redefinition of {}'.format(var[1]))
 
@@ -101,7 +104,8 @@ class SemanticAnalyzer():
                 'REFERENCE': self.visit_unary,
                 'DEREFERENCE': self.visit_unary,
                 'SIZEOF': self.visit_unary,
-                'VARIABLE': self.visit_variable
+                'VARIABLE': self.visit_variable,
+                'PREINCREMENT': self.visit_unary
         }
         jt.get(expr[0], lambda e: None)(expr)
 
@@ -115,14 +119,29 @@ class SemanticAnalyzer():
 
 
     def visit_if(self, stmt):
+        self.visit_expr(stmt[1])
+        self.visit_statement(stmt[2])
+        if stmt[3]:
+            self.visit_statement(stmt[3][0])
         pass
 
 
     def visit_return(self, stmt):
-        pass
+        self.visit_expr(stmt[1])
 
 
     def visit_block(self, block):
+        sym = SymbolTable(self.current)
+        self.current = sym
+
+        for s in block[-1]:
+            # jt.get(s[0], lambda s: None)(s)
+            self.visit_statement(s)
+
+        self.current = self.current.outer
+
+
+    def visit_statement(self, stmt):
         jt = {
                 'CALL':     self.visit_call,
                 'DECLARE':  self.visit_declaration,
@@ -131,14 +150,10 @@ class SemanticAnalyzer():
                 'WHILE':    self.visit_while,
                 'DO_WHILE': self.visit_do_while,
                 'RETURN':   self.visit_return,
+                'BLOCK':    self.visit_block,
+                'EMPTY':    lambda s: None
         }
-        sym = SymbolTable(self.current)
-        self.current = sym
-
-        for s in block[-1]:
-            jt.get(s[0], lambda s: None)(s)
-
-        self.current = self.current.outer
+        jt.get(stmt[0], self.visit_expr)(stmt)
 
 
     def visit_function(self, func):
@@ -168,6 +183,8 @@ class SemanticAnalyzer():
 
 
     def analyze(self, ast=tuple()):
+        self.globals.clear()
+        self.current = self.globals
         self.visit_program(ast)
 
         return self.current.symbols
