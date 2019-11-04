@@ -30,7 +30,6 @@ class PyCC():
                     PyCC.compile_line(line)
 
 
-
     def file(path=''):
         with open(path) as fp:
             PyCC.lines = [line.strip() for line in fp]

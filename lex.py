@@ -8,7 +8,7 @@ class Lexer():
 
     token_names = OrderedDict()
 
-    token_names['(int)|(char)|(float)|(void)'] = 'TK_TYPE'
+    token_names['((int)|(char)|(float)|(void))\**'] = 'TK_TYPE'
     token_names[r'"(?:\\.|[^"\\])*"'] = 'TK_STRING'
     token_names['if'] = 'TK_IF'
     token_names['else'] = 'TK_ELSE'

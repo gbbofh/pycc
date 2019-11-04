@@ -53,16 +53,20 @@ class SemanticAnalyzer():
             self.current.insert(var[1], var[2:])
             if var[2] == 'void':
                 raise SemanticError('identifier ' + var[1] + ' cannot be void')
-        elif type_info[0] == var[2]: # TODO: This check for equality is probably bogus
+        elif type_info[0] == var[2]:
             raise SemanticError('redefinition of {}'.format(var[1]))
+        elif type_info[0] != var[1]:
+            raise SemanticError('conflicting types for {}'.format(var[1]))
 
 
     def visit_function_declaration(self, var):
         type_info = self.current.lookup(var[1], check_outer=False)
         if not type_info:
             self.current.insert(var[1], var[2:])
-        elif type_info[0] == var[2]: # TODO: This check for equality is probably bogus
+        elif type_info[0] == var[2]:
             raise SemanticError('redefinition of {}'.format(var[1]))
+        elif type_info[0] != var[1]:
+            raise SemanticError('conflicting types for {}'.format(var[1]))
 
 
     def visit_assignment(self, var):
@@ -145,7 +149,6 @@ class SemanticAnalyzer():
         self.current = sym
 
         for s in block[-1]:
-            # jt.get(s[0], lambda s: None)(s)
             self.visit_statement(s)
 
         self.current = self.current.outer

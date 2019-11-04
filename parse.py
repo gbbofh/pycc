@@ -388,7 +388,7 @@ class Parser():
 
         # if self.tokens[0][0] == 'TK_STAR':
         #     self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        #     type_info += '_PTR'
+        #     type_info += '*'
 
         if not self.tokens[0][0] == 'TK_IDENTIFIER':
             line, col = self.tokens[0][2], self.tokens[0][3]
