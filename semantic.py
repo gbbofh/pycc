@@ -13,7 +13,7 @@ class SymbolTable():
 
 
     def insert(self, name, *args):
-        self.symbols[name] = args
+        self.symbols[name] = args[0]
 
 
     def lookup(self, name, check_outer=True):
@@ -37,6 +37,7 @@ class SemanticAnalyzer():
     def visit_program(self, prog):
         jt = {
                 'DECLARE':  self.visit_declaration,
+                'DECL_FUNC': self.visit_function_declaration,
                 'FUNCTION': self.visit_function,
                 'STRUCT': lambda x: False
         }
@@ -52,7 +53,15 @@ class SemanticAnalyzer():
             self.current.insert(var[1], var[2:])
             if var[2] == 'void':
                 raise SemanticError('identifier ' + var[1] + ' cannot be void')
-        elif type_info[0] == var[2]:
+        elif type_info[0] == var[2]: # TODO: This check for equality is probably bogus
+            raise SemanticError('redefinition of {}'.format(var[1]))
+
+
+    def visit_function_declaration(self, var):
+        type_info = self.current.lookup(var[1], check_outer=False)
+        if not type_info:
+            self.current.insert(var[1], var[2:])
+        elif type_info[0] == var[2]: # TODO: This check for equality is probably bogus
             raise SemanticError('redefinition of {}'.format(var[1]))
 
 
@@ -111,11 +120,13 @@ class SemanticAnalyzer():
 
 
     def visit_while(self, stmt):
-        pass
+        self.visit_expr(stmt[1])
+        self.visit_statement(stmt[2])
 
 
     def visit_do_while(self, stmt):
-        pass
+        self.visit_statement(stmt[1])
+        self.visit_expr(stmt[2])
 
 
     def visit_if(self, stmt):
@@ -123,7 +134,6 @@ class SemanticAnalyzer():
         self.visit_statement(stmt[2])
         if stmt[3]:
             self.visit_statement(stmt[3][0])
-        pass
 
 
     def visit_return(self, stmt):

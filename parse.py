@@ -377,7 +377,7 @@ class Parser():
             raise ParseError('expected function body or \';\'', line, col)
 
         if not body:
-            return ('DECLARE', name, type_info, params)
+            return ('DECL_FUNC', name, type_info, params)
 
         return ('FUNCTION', name, type_info, params, body)
 

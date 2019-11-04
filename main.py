@@ -15,7 +15,7 @@ class PyCC():
 
     def repl():
         while True:
-            line = input('PyCC> ')
+            line = input('PyCC> ').strip()
             op = PyCC.repl_cmds.get(line)
             if op:
                 op()
