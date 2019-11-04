@@ -206,6 +206,13 @@ class SemanticAnalyzer():
         elif len(type_info[1]) < len(func[2]):
             raise SemanticError('too many arguments to {}'.format(func[1]))
 
+        for p in func[3]:
+            type_info = self.current.lookup(p[1])
+            if not type_info:
+                self.current.insert(p[1], p[2])
+            else:
+                raise SemanticError('redefininition of parameter ' + p[1])
+
 
     def analyze(self, ast=tuple()):
         self.globals.clear()

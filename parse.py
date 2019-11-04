@@ -346,8 +346,8 @@ class Parser():
                 if not self.tokens[0][0] == 'TK_COMMA':
                     break
                 self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        if len(params) == 0:
-            params = None
+        # if len(params) == 0:
+        #    params = None
         return params
 
 
