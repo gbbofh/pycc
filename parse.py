@@ -315,10 +315,6 @@ class Parser():
             raise ParseError('expected \';\' following declaration', line, col)
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
-        # if type_info == 'void':
-        #     line, col = self.tokens[0][2], self.tokens[0][3]
-        #     raise ParseError('variable cannot be declared void', line, col)
-
         return ('DECLARE', name, type_info, expr)
 
 
@@ -385,10 +381,6 @@ class Parser():
     def function_variable_decl(self):
         expr = None
         type_info = self.prev[1]
-
-        # if self.tokens[0][0] == 'TK_STAR':
-        #     self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        #     type_info += '*'
 
         if not self.tokens[0][0] == 'TK_IDENTIFIER':
             line, col = self.tokens[0][2], self.tokens[0][3]
