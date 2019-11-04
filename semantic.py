@@ -186,7 +186,11 @@ class SemanticAnalyzer():
         self.current = sym
 
         for p in func[3]:
-            self.current.insert(p[1], p[2])
+            type_info = self.current.lookup(p[1])
+            if not type_info:
+                self.current.insert(p[1], p[2])
+            else:
+                raise SemanticError('redefininition of parameter ' + p[1])
 
         self.visit_block(func[-1])
 
