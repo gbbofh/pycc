@@ -23,7 +23,7 @@ class Preprocessor():
             if m:
                 path = line[m.end() : ].strip()
                 with open(path.strip('"')) as fp:
-                    tl = fp.readlines()
+                    tl = [x.strip() for x in fp.readlines()]
                     tl = self.process(tl)
                     new_lines += tl
                 line = line[0 : m.start()]
