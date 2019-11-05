@@ -57,6 +57,9 @@ class Lexer():
 
     token_names['!'] = 'TK_BANG'
 
+    token_names['\['] = 'TK_LBRACK'
+    token_names['\]'] = 'TK_RBRACK'
+
     token_names['\('] = 'TK_LPAR'
     token_names['\)'] = 'TK_RPAR'
 
