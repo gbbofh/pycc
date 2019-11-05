@@ -50,14 +50,40 @@ class Parser():
         return ('VARIABLE', self.prev[1])
 
 
+    def compound_initializer(self):
+        inits = tuple()
+        
+        if self.tokens[0][0] != 'TK_RBRACE':
+            while True:
+                inits += (self.expression(),)
+                if self.tokens[0][0] != 'TK_COMMA':
+                    break
+                self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        return inits
+
+
     def group(self):
-        if self.tokens[0][0] == 'TK_TYPE':
+        if self.tokens[0][0] in ('TK_TYPE', 'TK_STRUCT'):
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
             t = self.prev[1]
+
+            if t == 'struct':
+                self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+                t += ' ' + self.prev[1]
+
             if not self.tokens[0][0] == 'TK_RPAR':
                 raise ParseError('expected \')\' following type')
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-            expr = self.expression();
+
+            if self.tokens[0][0] == 'TK_LBRACE':
+                self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+                expr = self.compound_initializer()
+                if not self.tokens[0][0] == 'TK_RBRACE':
+                    raise ParseError('expected \'}\' following compound initializer')
+                self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+                return ('COMPOUND', t, expr)
+
+            expr = self.expression()
             return ('CAST', t, expr)
         expr = ('GROUP', self.expression())
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
@@ -407,8 +433,6 @@ class Parser():
             return self.struct_decl(type_info)
         else:
             return self.variable_decl(type_info)
-            #line, col = self.tokens[0][2], self.tokens[0][3]
-            #raise ParseError('expected declaration', line, col)
 
 
     def struct_decl_members(self):
@@ -482,6 +506,7 @@ class Parser():
     # Rule entries follow the following format:
     # prefix handler, infix handler, precedence number
     # TODO: Need to add support for compound initializers
+    # Not sure if they should go in this table as a primary expression, or not
     rule = {
 
             'TK_LPAR':          (group, call, Precedence.CALL),
