@@ -29,7 +29,11 @@ class Parser():
 
 
     def type_number(self):
-        f = float(self.prev[1])
+        f = 0
+        if 'x' in self.prev[1] or 'X' in self.prev[1]:
+            f = int(self.prev[1], 0)
+        else:
+            f = float(self.prev[1])
         return ('NUMBER', f)
 
 
@@ -441,11 +445,12 @@ class Parser():
 
     # Rule entries follow the following format:
     # prefix handler, infix handler, precedence number
+    # TODO: Need to add support for compound initializers
     rule = {
 
             'TK_LPAR':          (group, call, Precedence.CALL),
             'TK_RPAR':          (None, None, Precedence.NONE),
-            'TK_LBRACE':        (None, None, Precedence.NONE),
+            'TK_LBRACE':        (None, None, Precedence.NONE), # compound init.
             'TK_RBRACE':        (None, None, Precedence.NONE),
             'TK_DPLUS':         (pre_op, post_op, Precedence.UNARY),
             'TK_DMINUS':        (pre_op, post_op, Precedence.UNARY),

@@ -32,6 +32,8 @@ class SemanticAnalyzer():
     def __init__(self):
         self.globals = SymbolTable()
         self.current = self.globals
+        self.types = SymbolTable() # Each struct/union/enum gets its own table
+        self.labels = SymbolTable()
 
 
     def visit_program(self, prog):
@@ -47,9 +49,14 @@ class SemanticAnalyzer():
             jt[statement[0]](statement)
 
 
+    def constant(self, expr):
+        pass
+
+
     # TODO: Check if global declarations evaluate to constant expressions
     def visit_global_declaration(self, var):
         self.visit_declaration(var)
+        self.constant(var[2:])
 
 
     def visit_declaration(self, var):

@@ -19,7 +19,8 @@ class Lexer():
     token_names['sizeof'] = 'TK_SIZEOF'
     token_names['[A-Za-z_][A-Za-z0-9_]*'] = 'TK_IDENTIFIER'
     #token_names['((0x[0-9A-Fa-f]+)|([0-9]+))'] = 'TK_INTEGER'
-    token_names['[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'] = 'TK_NUMBER'
+    #token_names['[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'] = 'TK_NUMBER'
+    token_names['(0x[0-9A-Fa-f]+)|[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'] = 'TK_NUMBER'
     token_names['\".*?\"'] = 'TK_STRING'
 
     token_names['&&'] = 'TK_LAND'
