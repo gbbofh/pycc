@@ -47,6 +47,8 @@ class Lexer():
     token_names['\+\+'] = 'TK_DPLUS'
     token_names['--'] = 'TK_DMINUS'
 
+    token_names['->'] = 'TK_ARROW'
+
     token_names['\+'] = 'TK_PLUS'
     token_names['-'] = 'TK_MINUS'
 
@@ -67,28 +69,7 @@ class Lexer():
     token_names[';'] = 'TK_ENDLINE'
 
     token_names[','] = 'TK_COMMA'
-
-    # token_names = {
-
-    #         '=': 'TK_EQUAL',
-    #         '==': 'TK_EQEQUAL',
-    #         '>': 'TK_GREATER',
-    #         '<': 'TK_LESSER',
-    #         '>=': 'TK_GEQUAL',
-    #         '<=': 'TK_LEQUAL',
-    #         '\+': 'TK_PLUS',
-    #         '-': 'TK_MINUS',
-    #         '\*': 'TK_STAR',
-    #         '/': 'TK_SLASH',
-    #         '\{': 'TK_LBRACE',
-    #         '\}': 'TK_RBRACE',
-    #         '\(': 'TK_LPAR',
-    #         '\)': 'TK_RPAR',
-    #         '(int)': 'TK_TYPE',
-    #         '[A-Za-z_][A-Za-z0-9_]*': 'TK_IDENTIFIER',
-    #         '(0x[0-9A-Fa-f]+)|([0-9]+)' : 'TK_NUMBER',
-    #         ';': 'TK_ENDL'
-    # }
+    token_names['\.'] = 'TK_DOT'
 
     def tokenize(self, lines):
         tokens = []
