@@ -119,7 +119,8 @@ class SemanticAnalyzer():
                 'DEREFERENCE': self.visit_unary,
                 'SIZEOF': self.visit_unary,
                 'VARIABLE': self.visit_variable,
-                'PREINCREMENT': self.visit_unary
+                'PREINCREMENT': self.visit_unary,
+                'POSTINCREMENT': self.visit_unary
         }
         jt.get(expr[0], lambda e: None)(expr)
 
