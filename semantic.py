@@ -128,6 +128,8 @@ class SemanticAnalyzer():
                 'LESSER': self.visit_binary,
                 'LOGICAL_AND': self.visit_binary,
                 'LOGICAL_OR': self.visit_binary,
+                'DIRECT_ACCESS': self.visit_binary,
+                'INDIRECT_ACCESS': self.visit_binary,
                 'NEGATE': self.visit_unary,
                 'BANG': self.visit_unary,
                 'BITWISE_NOT': self.visit_unary,

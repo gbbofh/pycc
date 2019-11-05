@@ -21,7 +21,6 @@ class Precedence(IntEnum):
 
 class Parser():
 
-
     def __init__(self, tokens=[]):
         self.tokens = tokens
         if tokens:
@@ -113,7 +112,7 @@ class Parser():
 
     def call(self, left):
         args = self.call_args()
-        left = (left[1])
+        #left = (left[1])
         return ('CALL', left, args)
 
 
@@ -174,7 +173,9 @@ class Parser():
                 'TK_LESSER':    'LESSER',
 
                 'TK_LAND':      'LOGICAL_AND',
-                'TK_LOR':       'LOGICAL_OR'
+                'TK_LOR':       'LOGICAL_OR',
+                'TK_ARROW':     'INDIRECT_ACCESS',
+                'TK_DOT':       'DIRECT_ACCESS'
         }
         op = self.prev[0]
         rule = Parser.rule[op]
@@ -511,8 +512,10 @@ class Parser():
 
             'TK_LPAR':          (group, call, Precedence.CALL),
             'TK_RPAR':          (None, None, Precedence.NONE),
-            'TK_LBRACE':        (None, None, Precedence.NONE), # compound init.
+            'TK_LBRACE':        (None, None, Precedence.NONE),
             'TK_RBRACE':        (None, None, Precedence.NONE),
+            'TK_ARROW':         (None, binary, Precedence.CALL),
+            'TK_DOT':           (None, binary, Precedence.CALL),
             'TK_DPLUS':         (pre_op, post_op, Precedence.UNARY),
             'TK_DMINUS':        (pre_op, post_op, Precedence.UNARY),
             'TK_MINUS':         (unary, binary, Precedence.TERM),
