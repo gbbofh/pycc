@@ -389,34 +389,34 @@ class Parser():
             raise ParseError('expected identifier name', line, col)
 
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        name = self.prev
+        name = self.prev[1]
+
+        if type_info == 'struct':
+            type_info += ' ' + name
+
+        if self.tokens[0][0] == 'TK_IDENTIFIER':
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            name = self.prev[1]
 
         if self.tokens[0][0] == 'TK_LPAR':
             return self.function_decl(type_info)
-
-        return self.variable_decl(type_info)
+        elif type_info.startswith('struct') and name not in type_info:
+            return self.variable_decl((type_info))
+        elif type_info.startswith('struct'):
+            return self.struct_decl(type_info)
+        else:
+            return self.variable_decl(type_info)
+            #line, col = self.tokens[0][2], self.tokens[0][3]
+            #raise ParseError('expected declaration', line, col)
 
 
     def struct_decl_members(self):
-        pass
-
-
-    def struct_decl(self):
         members = tuple()
-
-        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        name = self.prev[1]
-        if not self.tokens[0][0] == 'TK_LBRACE':
-            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ] # ;
-            return ('DECL_STRUCT', name, members)
-        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-
-        # TODO: parse assignment
         while self.tokens[0][0] != 'TK_RBRACE':
 
             if not self.tokens[0][0] == 'TK_TYPE':
                 line, col = self.tokens[0][2], self.tokens[0][3]
-                raise ParseError('expected type', line, col)
+                raise ParseError('expected type in member declaration', line, col)
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
             type_info = self.prev[1]
 
@@ -432,10 +432,47 @@ class Parser():
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
             members += ('MEMBER', name, type_info)
+        return members
+
+
+    def struct_decl(self, name):
+        members = tuple()
+
+        #self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        #name = self.prev[1]
+        #if not self.tokens[0][0] == 'TK_LBRACE':
+        #    self.prev, self.tokens = self.tokens[0], self.tokens[1 : ] # ;
+        #    return ('DECL_STRUCT', name, members)
+        #self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        # TODO: parse assignment
+        if self.tokens[0][0] == 'TK_LBRACE':
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            members = self.struct_decl_members()
+        # while self.tokens[0][0] != 'TK_RBRACE':
+
+        #     if not self.tokens[0][0] == 'TK_TYPE':
+        #         line, col = self.tokens[0][2], self.tokens[0][3]
+        #         raise ParseError('expected type', line, col)
+        #     self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        #     type_info = self.prev[1]
+
+        #     if not self.tokens[0][0] == 'TK_IDENTIFIER':
+        #         line, col = self.tokens[0][2], self.tokens[0][3]
+        #         raise ParseError('expected identifier name', line, col)
+        #     self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+        #     name = self.prev[1]
+
+        #     if not self.tokens[0][0] == 'TK_ENDLINE':
+        #         line, col = self.tokens[0][2], self.tokens[0][3]
+        #         raise ParseError('expected \';\' after ', name, line, col)
+        #     self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+        #     members += ('MEMBER', name, type_info)
             # self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
             # TODO: parse struct members
 
-        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
         if not self.tokens[0][0] == 'TK_ENDLINE':
             line, col = self.tokens[0][2], self.tokens[0][3]
@@ -449,7 +486,7 @@ class Parser():
         decl = None
         declaration_types = {
                 'TK_TYPE':  self.function_variable_decl,
-                'TK_STRUCT': self.struct_decl
+                'TK_STRUCT': self.function_variable_decl
         }
         if self.tokens[0][0] in declaration_types:
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
