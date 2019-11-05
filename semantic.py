@@ -36,7 +36,7 @@ class SemanticAnalyzer():
 
     def visit_program(self, prog):
         jt = {
-                'DECLARE':  self.visit_declaration,
+                'DECLARE':  self.visit_global_declaration,
                 'DECL_FUNC': self.visit_function_declaration,
                 'FUNCTION': self.visit_function,
                 'STRUCT': lambda x: False
@@ -45,6 +45,11 @@ class SemanticAnalyzer():
             if not statement[0] in jt.keys():
                 raise SemanticError('expected declaration')
             jt[statement[0]](statement)
+
+
+    # TODO: Check if global declarations evaluate to constant expressions
+    def visit_global_declaration(self, var):
+        self.visit_declaration(var)
 
 
     def visit_declaration(self, var):
@@ -57,6 +62,9 @@ class SemanticAnalyzer():
             raise SemanticError('redefinition of {}'.format(var[1]))
         elif type_info[0] != var[1]:
             raise SemanticError('conflicting types for {}'.format(var[1]))
+
+        if var[-1]:
+            self.visit_expr(var[-1])
 
 
     def visit_function_declaration(self, var):
