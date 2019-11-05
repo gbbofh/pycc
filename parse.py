@@ -407,6 +407,7 @@ class Parser():
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         name = self.prev[1]
         if not self.tokens[0][0] == 'TK_LBRACE':
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ] # ;
             return ('DECL_STRUCT', name, members)
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 

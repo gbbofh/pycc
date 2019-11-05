@@ -41,7 +41,8 @@ class SemanticAnalyzer():
                 'DECLARE':  self.visit_global_declaration,
                 'DECL_FUNC': self.visit_function_declaration,
                 'FUNCTION': self.visit_function,
-                'STRUCT': lambda x: False
+                'STRUCT': lambda x: False,
+                'DECL_STRUCT': lambda x: False
         }
         for statement in prog[-1]:
             if not statement[0] in jt.keys():
