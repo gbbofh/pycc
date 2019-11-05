@@ -79,8 +79,9 @@ class PyCC():
         PyCC._print_ast_node(ast)
         print('\n')
 
-        print('Symbols:')
-        print(symbols)
+        print('Global Symbols:')
+        for sym in symbols:
+            print('{} : {}'.format(sym, symbols[sym]))
         print('\n')
 
 
