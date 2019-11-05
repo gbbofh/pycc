@@ -93,6 +93,7 @@ class SemanticAnalyzer():
 
     def visit_expr(self, expr):
         jt = {
+                'CALL': self.visit_call,
                 'ADD': self.visit_binary,
                 'SUB': self.visit_binary,
                 'MULT': self.visit_binary,
@@ -156,7 +157,6 @@ class SemanticAnalyzer():
 
     def visit_statement(self, stmt):
         jt = {
-                'CALL':     self.visit_call,
                 'DECLARE':  self.visit_declaration,
                 'ASSIGN':   self.visit_assignment,
                 'IF':       self.visit_if,
@@ -206,12 +206,10 @@ class SemanticAnalyzer():
         elif len(type_info[1]) < len(func[2]):
             raise SemanticError('too many arguments to {}'.format(func[1]))
 
-        for p in func[3]:
+        for p in func[2]:
             type_info = self.current.lookup(p[1])
             if not type_info:
-                self.current.insert(p[1], p[2])
-            else:
-                raise SemanticError('redefininition of parameter ' + p[1])
+                raise SemanticError('undefined reference to ' + p[1])
 
 
     def analyze(self, ast=tuple()):
