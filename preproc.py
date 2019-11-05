@@ -19,9 +19,18 @@ class Preprocessor():
                 val = line[m.end() + ident.end() : ]
                 self.symbols[ident.group().strip()] = val.strip()
                 line = line[0 : m.start()]
+            m = re.search('#include', line)
+            if m:
+                path = line[m.end() : ].strip()
+                with open(path.strip('"')) as fp:
+                    tl = fp.readlines()
+                    tl = self.process(tl)
+                    new_lines += tl
+                line = line[0 : m.start()]
             for i in self.symbols:
                 m = re.search(i, line)
                 if m:
                     line = re.sub(m.re, self.symbols[i], line) 
-            new_lines.append(line)
+            if line:
+                new_lines.append(line)
         return new_lines
