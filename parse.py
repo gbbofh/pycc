@@ -407,7 +407,7 @@ class Parser():
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         name = self.prev[1]
         if not self.tokens[0][0] == 'TK_LBRACE':
-            return ('STRUCT', name, members)
+            return ('DECL_STRUCT', name, members)
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
         # TODO: parse assignment
@@ -441,7 +441,7 @@ class Parser():
             raise ParseError('expected \';\' following declaration', line, col)
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
-        return ('DECL_STRUCT', name, members)
+        return ('STRUCT', name, members)
 
 
     def declaration(self):
