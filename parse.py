@@ -350,8 +350,6 @@ class Parser():
                 if not self.tokens[0][0] == 'TK_COMMA':
                     break
                 self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
-        # if len(params) == 0:
-        #    params = None
         return params
 
 
@@ -399,22 +397,51 @@ class Parser():
         return self.variable_decl(type_info)
 
 
+    def struct_decl_members(self):
+        pass
+
+
     def struct_decl(self):
+        members = tuple()
+
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
         name = self.prev[1]
         if not self.tokens[0][0] == 'TK_LBRACE':
-            return ('STRUCT', name, None)
+            return ('STRUCT', name, members)
+        self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
         # TODO: parse assignment
         while self.tokens[0][0] != 'TK_RBRACE':
+
+            if not self.tokens[0][0] == 'TK_TYPE':
+                line, col = self.tokens[0][2], self.tokens[0][3]
+                raise ParseError('expected type', line, col)
             self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            type_info = self.prev[1]
+
+            if not self.tokens[0][0] == 'TK_IDENTIFIER':
+                line, col = self.tokens[0][2], self.tokens[0][3]
+                raise ParseError('expected identifier name', line, col)
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+            name = self.prev[1]
+
+            if not self.tokens[0][0] == 'TK_ENDLINE':
+                line, col = self.tokens[0][2], self.tokens[0][3]
+                raise ParseError('expected \';\' after ', name, line, col)
+            self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
+            members += ('MEMBER', name, type_info)
+            # self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
             # TODO: parse struct members
+
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
+
         if not self.tokens[0][0] == 'TK_ENDLINE':
             line, col = self.tokens[0][2], self.tokens[0][3]
             raise ParseError('expected \';\' following declaration', line, col)
         self.prev, self.tokens = self.tokens[0], self.tokens[1 : ]
 
-        return ('STRUCT', name, None)
+        return ('DECL_STRUCT', name, members)
 
 
     def declaration(self):
