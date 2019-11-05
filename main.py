@@ -24,8 +24,8 @@ class PyCC():
                     ln, src = line.split(maxsplit=1)
                     ln = int(ln)
                     if ln > len(PyCC.lines):
-                        PyCC.lines += ['' for x in range(ln + 1)]
-                    PyCC.lines[ln] = src
+                        PyCC.lines += ['' for x in range(ln + 2)]
+                    PyCC.lines[ln + 1] = src
                 except (ValueError, TypeError) as e:
                     PyCC.compile_line(line)
 
@@ -42,9 +42,8 @@ class PyCC():
             ast = PyCC.parser.parse(tokens)
             sym = PyCC.analyzer.analyze(ast)
 
-            print(tokens, '\n')
-            print(ast, '\n')
-            print(sym, '\n')
+            PyCC.print_results(tokens, ast, sym)
+
         except (LexError, ParseError, SemanticError) as e:
             print(e)
 
@@ -55,11 +54,34 @@ class PyCC():
             ast = PyCC.parser.parse(tokens)
             sym = PyCC.analyzer.analyze(ast)
 
-            print(tokens, '\n')
-            print(ast, '\n')
-            print(sym, '\n')
+            PyCC.print_results(tokens, ast, sym)
+
         except (LexError, ParseError, SemanticError) as e:
             print(e)
+
+
+    def _print_ast_node(node, level = 0):
+        if isinstance(node, tuple):
+            for e in node:
+                PyCC._print_ast_node(e, level + 1)
+        else:
+            print(' ' * level, node)
+
+
+    def print_results(tokens, ast, symbols):
+        print('Tokens:')
+        for t in tokens:
+            print(t)
+        print('\n')
+
+        print('Syntax Tree:')
+        #print(ast)
+        PyCC._print_ast_node(ast)
+        print('\n')
+
+        print('Symbols:')
+        print(symbols)
+        print('\n')
 
 
     def main():
@@ -78,7 +100,7 @@ class PyCC():
 
     repl_cmds = {
             'run': compile,
-            'print': print_lines,
+            'source': print_lines,
             'clear': lambda: PyCC.lines.clear(),
             'exit': lambda: sys.exit(0),
     }
